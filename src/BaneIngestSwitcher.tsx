@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { OBSWebSocket } from 'obs-websocket-js';
+import { OBSWebSocket } from 'obs-websocket-js';;
 import { 
   Cast,
   Link as LinkIcon,
@@ -69,15 +69,16 @@ export default function BaneIngestSwitcher() {
     // Load persisted data
     try {
       const savedLinks = localStorage.getItem(STORAGE_KEY_LINKS);
-      if (savedLinks) setLinks(JSON.parse(savedLinks));
+if (savedLinks) setLinks(JSON.parse(savedLinks) as LinkItem[]);
 
-      const savedConn = localStorage.getItem(STORAGE_KEY_CONN);
-      if (savedConn) {
-        const { address: sAddr, port: sPort, password: sPass } = JSON.parse(savedConn);
-        if (sAddr) setAddress(sAddr);
-        if (sPort) setPort(sPort);
-        if (sPass) setPassword(sPass);
-      }
+    const savedConn = localStorage.getItem(STORAGE_KEY_CONN);
+if (savedConn) {
+  const { address: sAddr, port: sPort, password: sPass } =
+    JSON.parse(savedConn) as { address?: string; port?: string; password?: string };
+  if (sAddr) setAddress(sAddr);
+  if (sPort) setPort(sPort);
+  if (sPass) setPassword(sPass);
+}
     } catch (e) {
       console.error("Failed to load saved data", e);
     }
@@ -187,7 +188,10 @@ export default function BaneIngestSwitcher() {
     try {
       const { inputs } = await obs.current.call('GetInputList');
       const mediaSources = inputs
-        .filter(input => SUPPORTED_KINDS.has(input.inputKind))
+        .filter(input => {
+  const kind = input.inputKind as string | null;
+  return kind && SUPPORTED_KINDS.has(kind);
+})
         .map(input => ({ name: input.inputName as string, kind: input.inputKind as string }));
       
       setSources(mediaSources);
@@ -567,21 +571,9 @@ export default function BaneIngestSwitcher() {
       </main>
 
       {/* Custom Scrollbar for pure black theme */}
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #333;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
-      `}</style>
+      
+       
+    
     </div>
   );
 }
